@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <stdexcept>
+#include <mshtml.h>
+
+const int MOVEMENT_COST = 10;
 
 std::vector<node> shortest_path::compute_shortest_path(
         const point& startPt, const point& goalPt,
@@ -15,8 +18,8 @@ std::vector<node> shortest_path::compute_shortest_path(
     grid<node*> nodeGrid(playground.width(), playground.height());
     for (auto& tileItem : playground) {
 
-        int posX = tileItem->x();
-        int posY = tileItem->y();
+        unsigned int posX = tileItem->x();
+        unsigned int posY = tileItem->y();
 
         node* currentNode = new node(posX, posY, tileItem->isBuildable());
 
@@ -48,13 +51,14 @@ std::vector<node> shortest_path::compute_shortest_path(
     }
 
     // TODO Start searching
-    for (auto& focus : openList) {
+    for (auto focus : openList) {
         closeList.push_back(focus);
         auto neighbours = get_neighbours(focus, nodeGrid, openList, closeList);
 
-        if ()
+        // TODO check neighbours
+            // TODO Add to close list
+            // TODO Re-parent if necessary
     }
-
 
     return path;
 }
@@ -66,31 +70,39 @@ int shortest_path::compute_heuristic(const node& current, const node& goal)
     return diffX + diffY;
 }
 
-std::vector<node*> shortest_path::get_neighbours(const node& focus, const grid<node*>& nodeGrid, const std::vector<node*>& openList, const std::vector<node*>& closeList) const
+std::vector<node*> shortest_path::get_neighbours(node* focus, const grid<node*>& nodeGrid, const std::vector<node*>& openList, const std::vector<node*>& closeList) const
 {
     std::vector<node*> result;
 
     // Left
-    node* left = nodeGrid.at(focus.x() - 1, focus.y());
-    if (contains(openList, left)) {
+    node* left = nodeGrid.at(focus->x() - 1, focus->y());
+    if (isEligible(left, openList, closeList)) {
+        left->setParent(focus);
+        left->setG(focus->g() + MOVEMENT_COST);
         result.push_back(left);
     }
 
     // Top
-    node* top = nodeGrid.at(focus.x(), focus.y() + 1);
-    if (contains(openList, top)) {
+    node* top = nodeGrid.at(focus->x(), focus->y() + 1);
+    if (isEligible(top, openList, closeList)) {
+        top->setParent(focus);
+        top->setG(focus->g() + MOVEMENT_COST);
         result.push_back(top);
     }
 
     // Right
-    node* right = nodeGrid.at(focus.x() + 1, focus.y());
-    if (contains(openList, right)) {
+    node* right = nodeGrid.at(focus->x() + 1, focus->y());
+    if (isEligible(right, openList, closeList)) {
+        right->setParent(focus);
+        right->setG(focus->g() + MOVEMENT_COST);
         result.push_back(right);
     }
 
     // Bottom
-    node* bottom = nodeGrid.at(focus.x(), focus.y() - 1);
-    if (contains(openList, bottom)) {
+    node* bottom = nodeGrid.at(focus->x(), focus->y() - 1);
+    if (isEligible(bottom, openList, closeList)) {
+        bottom->setParent(focus);
+        bottom->setG(focus->g() + MOVEMENT_COST);
         result.push_back(bottom);
     }
 

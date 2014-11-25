@@ -9,7 +9,10 @@ public:
     node(unsigned int x, unsigned int y);
     node(unsigned int x, unsigned int y, bool eligible);
 
-    /** Sum of Heuristic and movement cost (h_ + g_) */
+    /** @Returns the movement cost (g_) */
+    int g() const;
+
+    /** @Returns the sum of Heuristic and movement cost (h_ + g_) */
     int f() const;
 
     bool isEligible() const;
@@ -17,6 +20,8 @@ public:
     void setHeuristic(int heuristic);
 
     void setParent(node* parent);
+
+    void setG(int movementCost);
 
 private:
     /** Heuristic */

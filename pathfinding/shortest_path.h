@@ -13,7 +13,7 @@ public:
 
     static int compute_heuristic(const node& current, const node& goal);
 
-    static std::vector<node*> get_neighbours(const node& focus, const grid<node*>& nodeGrid, const std::vector<node*>& openList, const std::vector<node*>& closeList) const;
+    static std::vector<node*> get_neighbours(node* focus, const grid<node*>& nodeGrid, const std::vector<node*>& openList, const std::vector<node*>& closeList) const;
 
     static bool contains(const std::vector<node*>& items, const node* item) const;
 
