@@ -5,14 +5,18 @@
 * A point p1 is equal to a point p2 if p1.x == p2.x and p1.y == p2.y.
 */
 template<typename T>
-class point<T> {
+class point {
 
 public:
-    point(T x, T y);
-    bool operator ==(const point& p1, const point& p2) const;
+    point(T x, T y) : x_(x), y_(y) { }
 
-    T x() const;
-    T y() const;
+    bool operator==(const point& compared) const
+    {
+        return x_ == compared.x() && y_ == compared.y();
+    }
+
+    T x() const { return x_; }
+    T y() const { return y_; }
 
 protected:
     T x_;

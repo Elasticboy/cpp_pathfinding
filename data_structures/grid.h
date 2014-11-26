@@ -1,4 +1,5 @@
 #include <vector>
+#include <stdexcept>
 
 #pragma once
 
@@ -10,13 +11,17 @@ template<typename T>
 class grid : public std::vector<T> {
 
 public:
-    grid(unsigned int width, unsigned int height);
+    grid(const unsigned int& width, const unsigned int& height)
+            : width_(width), height_(height)
+    {
+        std::vector<T>::resize(width_ * height);
+    }
 
     /** @return The width of the grid */
-    unsigned int width() const;
+    unsigned int width() const { return width_; }
 
     /** @return The height of the grid */
-    unsigned int height() const;
+    unsigned int height() const { return height_; }
 
     /**
     * @Param x position of the item
@@ -25,7 +30,18 @@ public:
     * The parameter are first checked that they are in the range of the grid.
     * The function throws out_of_range if the check fails.
     */
-    T at(unsigned int x, unsigned int y) const;
+    T at(unsigned int x, unsigned int y) const
+    {
+        // Check out of bound error
+        if (x < 0 || x >= width_) {
+            throw std::out_of_range("x is out of the grid bounds (" + std::to_string(width_) + "x" + std::to_string(height_) + ").");
+        }
+        if (y < 0 || y >= height_) {
+            throw std::out_of_range("y is out of the grid bounds (" + std::to_string(width_) + "x" + std::to_string(height_) + ").");
+        }
+        auto item = y * width_ + x;
+        return std::vector<T>::at(item);
+    }
 
 private:
 

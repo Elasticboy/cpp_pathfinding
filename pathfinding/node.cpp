@@ -10,10 +10,12 @@ int node::g() const { return g_; }
 
 int node::f() const { return h_ + g_; }
 
+node* node::parent() { return parent_; }
+
 bool node::isEligible() const { return eligible_; }
 
-void node::setHeuristic(int heuristic) { h_ = heuristic; }
+void node::setG(int movementCost) { g_ = movementCost; }
 
 void node::setParent(node* parent) { parent_ = parent; }
 
-void node::setG(int movementCost) { g_ = movementCost; }
+void node::setHeuristic(int heuristic) { h_ = heuristic; }

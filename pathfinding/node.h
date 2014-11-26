@@ -15,13 +15,15 @@ public:
     /** @Returns the sum of Heuristic and movement cost (h_ + g_) */
     int f() const;
 
+    node* parent();
+
     bool isEligible() const;
 
-    void setHeuristic(int heuristic);
+    void setG(int movementCost);
 
     void setParent(node* parent);
 
-    void setG(int movementCost);
+    void setHeuristic(int heuristic);
 
 private:
     /** Heuristic */
