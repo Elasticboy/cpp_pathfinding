@@ -10,7 +10,6 @@ std::vector<node*> shortest_path::compute_shortest_path(
         const unsigned int& goalX, const unsigned int& goalY,
         const grid<tile*>& playground)
 {
-    std::cout << "Start compute_shortest_path" << std::endl;
 
     node* startNode = nullptr;
     node* goalNode = nullptr;
@@ -31,16 +30,19 @@ std::vector<node*> shortest_path::compute_shortest_path(
             goalNode = currentNode;
         }
 
-        nodeGrid.push_back(currentNode);
+        nodeGrid.at(posX, posY) = currentNode;
     }
 
-    if (!startNode || !startNode->isEligible()) {
-        std::cout << "Start node is not iligible" << std::endl;
+    if (!startNode) {
+        throw std::logic_error("Start node is out of the grid bounds");
+
+    } else if (!startNode->isEligible()) {
         throw std::logic_error("Start node is not iligible");
-    }
 
-    if (!goalNode || !goalNode->isEligible()) {
-        std::cout << "Goal node is not iligible" << std::endl;
+    } else if (!goalNode) {
+        throw std::logic_error("Goal node is out of the grid bounds");
+
+    } else if (!goalNode->isEligible()) {
         throw std::logic_error("Goal node is not iligible");
     }
 
@@ -51,51 +53,70 @@ std::vector<node*> shortest_path::compute_shortest_path(
     openList.insert(startNode);
 
     bool found = false;
-    for (auto focus : openList) {
-        closeList.insert(focus);
-        openList.erase(focus);
+    node* currentNode;
+    auto it = std::begin(openList);
+    while (it != std::end(openList)) {
+        currentNode = *it;
+        std::cout << "Testing node " << currentNode->x() << "x" << currentNode->y() << std::endl;
+
+        openList.erase(it);
+        closeList.insert(currentNode);
 
         // If the node is eligible, compute the Manhattan heuristic
-        if (focus->isEligible()) {
-            int heuristic = compute_heuristic(*focus, *goalNode);
-            focus->setHeuristic(heuristic);
+        if (currentNode->isEligible()) {
+            int heuristic = compute_heuristic(*currentNode, *goalNode);
+            currentNode->setHeuristic(heuristic);
         }
 
         // Check neighbours
-        auto neighbours = get_neighbours(focus, nodeGrid, closeList);
+        auto neighbours = get_neighbours(currentNode, nodeGrid, closeList);
+
         for (auto neighbour : neighbours) {
 
+            std::cout << "Testing neighbour " << neighbour->x() << "x" << neighbour->y() << std::endl;
+
             if (neighbour == goalNode) {
-                neighbour->setParent(focus);
-                neighbour->setG(focus->g() + STEP_COST);
+                neighbour->setParent(currentNode);
+                neighbour->setG(currentNode->g() + STEP_COST);
                 found = true;
+
+                std::cout << "Goal found!" << std::endl;
                 break;
             }
+
             // If the neighbour node is on the openList,
             // check if the current node is a better parent
             if (contains(openList, neighbour)) {
                 // Re-check g value
-                int newGValue = focus->g() + STEP_COST;
+                int newGValue = currentNode->g() + STEP_COST;
                 if (newGValue < neighbour->g()) {
                     // If better, re-parent
-                    neighbour->setParent(focus);
+                    neighbour->setParent(currentNode);
                     neighbour->setG(newGValue);
                 }
             } else {
-                neighbour->setParent(focus);
-                neighbour->setG(focus->g() + STEP_COST);
+                openList.insert(neighbour);
+                neighbour->setParent(currentNode);
+                neighbour->setG(currentNode->g() + STEP_COST);
             }
         }
+
+        if (found) {
+            break;
+        }
+        it = std::begin(openList);
     }
 
     std::vector<node*> path;
     if (found) {
         node* currentNode = goalNode;
-        while (currentNode->parent()) {
+        while (currentNode) {
             path.push_back(currentNode);
             std::cout << "node " << currentNode->x() << "x" << currentNode->y() << std::endl;
             currentNode = currentNode->parent();
         }
+    } else {
+        std::cout << "No path found" << std::endl;
     }
 
     return path;
@@ -108,7 +129,7 @@ int shortest_path::compute_heuristic(const node& current, const node& goal)
     return diffX + diffY;
 }
 
-std::vector<node*> shortest_path::get_neighbours(node* focus, const grid<node*>& nodeGrid, const std::set<node*>& closeList)
+std::vector<node*> shortest_path::get_neighbours(node* focus, grid<node*>& nodeGrid, const std::set<node*>& closeList)
 {
     std::vector<node*> neighbours;
 

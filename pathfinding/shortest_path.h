@@ -16,7 +16,7 @@ public:
     static int compute_heuristic(const node& current, const node& goal);
 
     /** @returns the eligible neighbours of the current node. */
-    static std::vector<node*> get_neighbours(node* focus, const grid<node*>& nodeGrid, const std::set<node*>& closeList);
+    static std::vector<node*> get_neighbours(node* focus, grid<node*>& nodeGrid, const std::set<node*>& closeList);
 
     /** @returns true if the set contains the given node. */
     static bool contains(const std::set<node*>& items, const node* item);
